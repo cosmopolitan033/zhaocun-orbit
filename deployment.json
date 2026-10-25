@@ -1,0 +1,19 @@
+{
+  "provider": "Netlify",
+  "project_id": "df7ef271-8d8a-4ad5-a6a8-1d2593e0f9c0",
+  "deploy_id": "6ade47068c73a0226c5928d0",
+  "initial_project_slug": "calm-frangipane-ea045d",
+  "project_slug": "zhaocun-orbit",
+  "url": "https://zhaocun-orbit.netlify.app",
+  "repository": "https://github.com/cosmopolitan033/zhaocun-orbit",
+  "build_command": "npm run build",
+  "publish_directory": "dist",
+  "method": "manual zip upload",
+  "archive_sha256": "d09126b20cf83e4adcdc1832a01c10fdf0fc5e00c0c1b3d2f0e7bd88783be3bc",
+  "visibility": "public",
+  "verified_http_status": 200,
+  "verified_bundle_assets": [
+    "/assets/index-BvlwLXWv.js",
+    "/assets/index-BKQcZdth.css"
+  ]
+}
