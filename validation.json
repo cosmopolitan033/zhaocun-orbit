@@ -1,0 +1,15 @@
+{
+  "version": 3,
+  "date": "2026-10-27",
+  "checks": [
+    "Production build passed",
+    "git diff --check passed",
+    "Desktop mission panel and mobile 400px layout checked",
+    "Mission selection updates profile, instrument and priority",
+    "Mission JSON downloaded and selected values verified",
+    "Night-side profile opens corresponding 3D view",
+    "Original procedural planet preserved",
+    "Browser error log empty"
+  ],
+  "scope": "Independent project presentation; illustrative content clearly labelled"
+}

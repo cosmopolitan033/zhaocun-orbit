@@ -36,3 +36,13 @@ All source credits are retained in `public/credits.html` and `public/licenses/`.
 Keyboard-accessible controls, visible focus states, mobile layouts and reduced-motion support. WebGL pages provide a fallback when graphics cannot initialize.
 
 Upstream reference commit: `7a56d1fdc12058e3a955348a7a9f3387a2bf57da`.
+
+## Product presentation — October 2026
+
+An independent space mission concept. Explore Aster, compare flight profiles and build your own mission brief.
+
+- `src/project-content.js`: editable collection, route or mission content.
+- `src/project.js`: project sections and functional visitor interactions.
+- `src/project.css`: responsive editorial layouts.
+
+All mission/route settings are explicitly conceptual. FORME contains digital works, not physical editions. Export actions create local JSON files; the collection uses browser local storage. No accounts or server-side submission are required.

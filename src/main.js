@@ -1,4 +1,5 @@
 import './style.css';
+import { enrichOrbit } from './project.js';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { content as c } from './content';
@@ -7,13 +8,14 @@ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.querySelector('#app').innerHTML=`
 <a class="skip" href="#explore">Skip to interactive explorer</a>
 <div id="universe" aria-hidden="true"></div><div class="grain"></div>
-<header><a class="wordmark" href="#top">O<span class="mark-ring">R</span>BIT</a><span class="header-caption">A STUDY BY ${c.author.toUpperCase()}</span><nav><a href="#story">The perspective</a><a href="#explore">Explore the world <span>↗</span></a></nav></header>
-<main><section class="hero" id="top"><div class="hero-top"><span><i></i> ${c.subtitle.toUpperCase()}</span><span>EXPERIMENT 001 / 2026</span></div><div class="hero-copy"><p class="kicker">BEYOND THE FAMILIAR</p><h1>${c.headline[0]}<br><span>${c.headline[1]}</span></h1><div class="hero-foot"><p>${c.intro}</p><a class="round-link" href="#story" aria-label="Begin the journey"><span>↓</span></a></div></div><div class="hero-bottom"><span>SCROLL TO BEGIN THE JOURNEY</span><span>IMAGINED IN CODE. RENDERED LIVE.</span></div></section>
+<header><a class="wordmark" href="#top">O<span class="mark-ring">R</span>BIT</a><span class="header-caption">A MISSION CONCEPT BY ${c.author.toUpperCase()}</span><nav><a href="#mission">The missions</a><a href="#systems">The observatory</a><a href="#explore">Explore the world <span>↗</span></a></nav></header>
+<main><section class="hero" id="top"><div class="hero-top"><span><i></i> ${c.subtitle.toUpperCase()}</span><span>ASTER PROGRAMME / 2026</span></div><div class="hero-copy"><p class="kicker">AN INDEPENDENT MISSION DESIGN CONCEPT</p><h1>${c.headline[0]}<br><span>${c.headline[1]}</span></h1><div class="hero-foot"><p>${c.intro}</p><a class="round-link" href="#story" aria-label="Begin the journey"><span>↓</span></a></div></div><div class="hero-bottom"><span>SCROLL TO BEGIN THE JOURNEY</span><span>THREE FLIGHT PROFILES. ONE WORLD TO EXPLORE.</span></div></section>
 <div class="story" id="story">${c.chapters.map((s,i)=>`<section class="chapter chapter-${i}"><div class="chapter-copy"><p class="kicker">${s.number} / ${s.label}</p><h2>${s.title.replace('\n','<br>')}</h2><p>${s.text}</p><span class="coordinate">${i?'TRANSLATION / ROTATION / CONNECTION':'LIGHT / MATTER / PERSPECTIVE'}</span></div></section>`).join('')}</div>
 <section class="explorer" id="explore"><div class="explore-head"><div><p class="kicker">03 / YOUR PERSPECTIVE</p><h2>Take the controls.</h2></div><p>Change the viewpoint.<br>Let curiosity do the rest.</p></div><div class="explorer-window"><div class="cross cross-one">+</div><div class="cross cross-two">+</div><span class="view-label">LIVE VIEW / <b id="view-label">OVERVIEW</b></span><span class="view-note">A PROCEDURAL WORLD · NOT A SCIENTIFIC MODEL</span></div><div class="controls"><div class="view-buttons" role="group" aria-label="Camera viewpoint"><button class="active" data-view="0" aria-pressed="true">01 Overview</button><button data-view="1" aria-pressed="false">02 Close orbit</button><button data-view="2" aria-pressed="false">03 Night side</button></div><button class="pause" aria-pressed="false">Ⅱ Pause rotation</button></div><div class="speed"><label for="speed">ORBIT SPEED</label><input id="speed" type="range" min="0" max="3" step="0.1" value="1"><output for="speed">1.0×</output></div></section>
-<section class="closing"><p class="kicker">AN EXPERIMENT BY ${c.author.toUpperCase()}</p><h2>What lies<br><em>beyond?</em></h2><a href="${c.portfolio}" class="text-link">Explore my other work <span>↗</span></a><p class="disclaimer">A personal creative development study.<br>Built with Three.js and a little curiosity.</p></section></main>
+<section class="closing"><p class="kicker">THE NEXT MISSION STARTS WITH A QUESTION</p><h2>What lies<br><em>beyond?</em></h2><a href="${c.portfolio}" class="text-link">Explore my other work <span>↗</span></a><p class="disclaimer">An independent mission-design concept by zhaocun.<br>Fictional world. Illustrative mission data. Interactive exploration.</p></section></main>
 <footer><a class="wordmark" href="#top">ORBIT</a><span>© 2026 ${c.author} / CONCEPT & DEVELOPMENT</span><div><a href="${c.source}" target="_blank" rel="noreferrer">Source ↗</a><a href="/credits.html">Credits</a><a href="#top">Back to top ↑</a></div></footer><div class="progress" aria-hidden="true"></div>`;
-let scene,renderer,camera,world;
+enrichOrbit();
+let scene,renderer,camera,world,cameraTimeline;
 const cameraState={x:0,y:1.0,z:7.4},targetState={x:-.65,y:0,z:0};
 let pause=reduced,speed=1,activeView=0;
 try {
@@ -37,7 +39,7 @@ try {
  const dg=new THREE.BufferGeometry();dg.setAttribute('position',new THREE.BufferAttribute(dustPositions,3));dg.setAttribute('color',new THREE.BufferAttribute(dustColors,3));rings.add(new THREE.Points(dg,new THREE.PointsMaterial({size:.008,vertexColors:true,transparent:true,opacity:.9})));
  const stars=new Float32Array(1500*3);for(let i=0;i<stars.length;i++)stars[i]=(Math.random()-.5)*90;
  const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(stars,3));scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:'#cec4b7',size:.025,transparent:true,opacity:.65})));
- if(!reduced)cameraStory(cameraState,targetState);
+ if(!reduced)cameraTimeline=cameraStory(cameraState,targetState);
  let mouse={x:0,y:0};window.addEventListener('pointermove',e=>{mouse.x=e.clientX/innerWidth-.5;mouse.y=e.clientY/innerHeight-.5},{passive:true});
  function size(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}addEventListener('resize',size);
  let last=0;function render(t){const dt=Math.min((t-last)/1000,.05);last=t;
@@ -48,8 +50,8 @@ try {
  }requestAnimationFrame(render);
 }catch(e){document.querySelector('#universe').classList.add('fallback');console.warn('Using static space fallback',e);}
 const views=[{x:0,y:3,z:7},{x:2.3,y:.2,z:4.5},{x:-5,y:.1,z:2.8}];
-document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{activeView=Number(b.dataset.view);gsap.to(cameraState,{...views[activeView],duration:reduced?0:1.5});gsap.to(targetState,{x:0,y:0,z:0,duration:1});document.querySelectorAll('[data-view]').forEach(el=>{el.classList.toggle('active',el===b);el.setAttribute('aria-pressed',el===b)});document.querySelector('#view-label').textContent=['OVERVIEW','CLOSE ORBIT','NIGHT SIDE'][activeView]}));
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{cameraTimeline?.scrollTrigger?.disable(false);activeView=Number(b.dataset.view);gsap.to(cameraState,{...views[activeView],duration:reduced?0:1.5});gsap.to(targetState,{x:0,y:0,z:0,duration:1});document.querySelectorAll('[data-view]').forEach(el=>{el.classList.toggle('active',el===b);el.setAttribute('aria-pressed',el===b)});document.querySelector('#view-label').textContent=['OVERVIEW','CLOSE ORBIT','NIGHT SIDE'][activeView]}));
 function setPause(){document.querySelector('.pause').textContent=pause?'▷ Resume rotation':'Ⅱ Pause rotation';document.querySelector('.pause').setAttribute('aria-pressed',pause)}setPause();document.querySelector('.pause').onclick=()=>{pause=!pause;setPause()};
 document.querySelector('#speed').oninput=e=>{speed=Number(e.target.value);document.querySelector('output').textContent=speed.toFixed(1)+'×'};
-addEventListener('scroll',()=>{document.querySelector('.progress').style.transform=`scaleX(${scrollY/(document.documentElement.scrollHeight-innerHeight)})`},{passive:true});
+addEventListener('scroll',()=>{if(cameraTimeline&&scrollY<document.querySelector('#explore').offsetTop-innerHeight*.75&&!cameraTimeline.scrollTrigger.enabled)cameraTimeline.scrollTrigger.enable();document.querySelector('.progress').style.transform=`scaleX(${scrollY/(document.documentElement.scrollHeight-innerHeight)})`},{passive:true});
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.15});document.querySelectorAll('.chapter-copy,.closing,.explore-head').forEach(e=>io.observe(e));
