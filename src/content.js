@@ -9,5 +9,5 @@ export const content = {
   ],
   github:'https://github.com/cosmopolitan033',
   source:'https://github.com/cosmopolitan033/zhaocun-orbit',
-  portfolio:'https://zhaocun-portfolio.netlify.app',
+  portfolio:'https://zhaocun.netlify.app',
 };

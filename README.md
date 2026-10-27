@@ -3,7 +3,7 @@
 Personal creative development / frontend showcase. An interactive concept, not a commercial client commission.
 
 Live: https://zhaocun-orbit.netlify.app  
-Portfolio: https://zhaocun-portfolio.netlify.app
+Portfolio: https://zhaocun.netlify.app
 
 ## Run and build
 
